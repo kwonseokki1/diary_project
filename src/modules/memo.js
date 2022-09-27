@@ -1,5 +1,5 @@
 import { dynamicState } from "../utils/useDynamicState";
-import { getData } from "../assets/temp";
+import { getData, getDataById } from "../assets/temp";
 
 // Get memo actions
 const GET_MEMOS = "memo/GET_MEMOS";
@@ -37,7 +37,17 @@ export const getMemos = () => async (dispatch) => {
   }
 };
 
-export const getMemo = () => ({ type: GET_MEMO });
+export const getMemo = (id) => async (dispatch) => {
+  dispatch({ type: GET_MEMO });
+  try {
+    const res = await getDataById(id);
+    dispatch({ type: GET_MEMO_SUCCESS, data: res });
+  } catch (e) {
+    dispatch({ type: GET_MEMO_ERROR, error: e });
+  }
+};
+
+export const addMemo = (memo) => ({ type: ADD_MEMO, data: memo });
 
 export default function memoReducer(state = initialData, action) {
   switch (action.type) {
@@ -73,6 +83,7 @@ export default function memoReducer(state = initialData, action) {
         ...state,
         memo: dynamicState.error(action.error),
       };
+
     default:
       return state;
   }

@@ -1,4 +1,4 @@
 import MemoList from "./memolist/MemoList";
 import Memo from "./memo/Memo";
-
-export { Memo, MemoList };
+import InputComponent from "./InputComponent";
+export { Memo, MemoList, InputComponent };

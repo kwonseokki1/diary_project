@@ -1,11 +1,17 @@
 import React from "react";
-
-export default function MemoList({ memos }) {
-  console.log(memos);
+import { Link } from "react-router-dom";
+export default function MemoList({ memos, onClickHandler }) {
   return (
     <ul>
       {memos.map((memo) => (
-        <li key={memo.id}>{memo.title}</li>
+        <li
+          key={memo.id}
+          onClick={() => {
+            onClickHandler(memo.id);
+          }}
+        >
+          <Link to={`/${memo.id}`}> {memo.title}</Link>
+        </li>
       ))}
     </ul>
   );
