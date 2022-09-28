@@ -1,5 +1,6 @@
 import { dynamicState } from "../utils/useDynamicState";
 import { getData, getDataById } from "../assets/temp";
+import { createPromiseThunk } from "../utils/createPromiseThunk";
 
 // Get memo actions
 const GET_MEMOS = "memo/GET_MEMOS";
@@ -20,34 +21,20 @@ const initialData = {
     data: null,
     error: null,
   },
-  memo: {
-    loading: null,
-    data: null,
-    error: null,
-  },
+  memo: {},
 };
 
-export const getMemos = () => async (dispatch) => {
-  dispatch({ type: GET_MEMOS });
-  try {
-    const res = await getData();
-    dispatch({ type: GET_MEMOS_SUCCESS, data: res });
-  } catch (e) {
-    dispatch({ type: GET_MEMOS_ERROR, error: e });
-  }
-};
+export const getMemos = createPromiseThunk(GET_MEMOS, getData);
 
 export const getMemo = (id) => async (dispatch) => {
-  dispatch({ type: GET_MEMO });
+  dispatch({ type: GET_MEMO, meta: id });
   try {
-    const res = await getDataById(id);
-    dispatch({ type: GET_MEMO_SUCCESS, data: res });
+    const payload = await getDataById(id);
+    dispatch({ type: GET_MEMO_SUCCESS, payload, meta: id });
   } catch (e) {
-    dispatch({ type: GET_MEMO_ERROR, error: e });
+    dispatch({ type: GET_MEMO_ERROR, payload: e, error: true, meta: id });
   }
 };
-
-export const addMemo = (memo) => ({ type: ADD_MEMO, data: memo });
 
 export default function memoReducer(state = initialData, action) {
   switch (action.type) {
@@ -57,31 +44,41 @@ export default function memoReducer(state = initialData, action) {
         memos: dynamicState.loading(),
       };
     case GET_MEMOS_SUCCESS:
-      console.log(action);
       return {
         ...state,
-        memos: dynamicState.success(action.data),
+        memos: dynamicState.success(action.payload),
       };
     case GET_MEMOS_ERROR:
       return {
         ...state,
-        memos: dynamicState.error(action.error),
+        memos: dynamicState.error(action.payload),
       };
 
     case GET_MEMO:
       return {
         ...state,
-        memo: dynamicState.loading(),
+        memo: {
+          ...state.memo,
+          [action.meta]: dynamicState.loading(
+            state.memo[action.meta] && state.memo[action.meta]
+          ),
+        },
       };
     case GET_MEMO_SUCCESS:
       return {
         ...state,
-        memo: dynamicState.success(action.data),
+        memo: {
+          ...state.memo,
+          [action.meta]: dynamicState.success(action.payload),
+        },
       };
     case GET_MEMO_ERROR:
       return {
         ...state,
-        memo: dynamicState.error(action.error),
+        memo: {
+          ...state.memo,
+          [action.meta]: dynamicState.error(action.payload),
+        },
       };
 
     default:

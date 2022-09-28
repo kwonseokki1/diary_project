@@ -1,7 +1,7 @@
 export const dynamicState = {
-  loading: () => ({
+  loading: (prevState = null) => ({
     loading: true,
-    data: null,
+    data: prevState,
     error: null,
   }),
   success: (data) => ({
@@ -10,7 +10,7 @@ export const dynamicState = {
     error: null,
   }),
   error: (error) => ({
-    loading: true,
+    loading: false,
     data: null,
     error,
   }),

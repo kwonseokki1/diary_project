@@ -16,5 +16,5 @@ export const getData = async () => {
 // 특정 post 반환
 export const getDataById = async (id) => {
   await sleep(500);
-  return memos.find((post) => post.id === id);
+  return memos.find((post) => post.id == id);
 };

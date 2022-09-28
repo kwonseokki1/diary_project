@@ -1,25 +1,19 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getMemo, getMemos, addMemo } from "../modules/memo";
+import { getMemo, getMemos } from "../modules/memo";
 import { MemoList } from "../components";
-import { InputComponent } from "../components";
+
 export default function MemoListContainer() {
   const dispatch = useDispatch();
   const { data, loading, error } = useSelector(
     (state) => state.memoReducer.memos
   );
 
-  const onClickHandler = (id) => {
-    dispatch(getMemo(id));
-  };
-
-  const onSubmitHandler = (memo) => {
-    dispatch(addMemo(memo));
-  };
-
   useEffect(() => {
-    dispatch(getMemos());
-  }, []);
+    if (!data) {
+      dispatch(getMemos());
+    }
+  }, [data]);
 
   if (loading) return <div>로딩중...</div>;
   if (error) return <div>에러</div>;
@@ -27,8 +21,7 @@ export default function MemoListContainer() {
 
   return (
     <div>
-      <MemoList memos={data} onClickHandler={onClickHandler} />
-      <InputComponent onSubmitHandler={onSubmitHandler} />
+      <MemoList memos={data} />
     </div>
   );
 }
